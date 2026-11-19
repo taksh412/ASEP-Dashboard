@@ -3,111 +3,30 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 
-# exam_roaster_sub_name = exam_data['Exam Name'].unique().tolist()
+# Module-level placeholders, filled dynamically at runtime
+indicator_1a_pedagogy = []
+indicator_1b_content = []
 
-indicator_1a_pedagogy = [
-    "PPR EC-12",
-    "PPR EC-4",
-    "PPR 8-12",
-    "PPR EC-6",
-    "PPR 4-8"
-]
 
-indicator_1b_content = [
-    "Physical Education EC-12",
-    "Principal",
-    "Core Sub EC-6 Science",
-    "Core Sub EC-6 Soc Studies",
-    "Core Sub EC-6 ELAR/STR",
-    "Core Sub EC-6 Math",
-    "Core Sub EC-6 FA/Hlth/PE",
-    "ESL Supp",
-    "Generalist EC-4",
-    "History 8-12",
-    "Generalist EC-6",
-    "Mathematics 7-12",
-    "Music EC-12",
-    "Generalist 4-8",
-    "ELAR/Soc Studies 4-8",
-    "ELAR 7-12",
-    "Art All Level",
-    "Reading Specialist",
-    "Core Sub EC-6 ELAR",
-    "BTLPT - Spanish",
-    "Science of Teaching Reading",
-    "Bilingual Education Supp",
-    "Science 4-8",
-    "History 7-12",
-    "TOPT-Spanish",
-    "Bilingual Generalist EC-4",
-    "Special Education EC-12",
-    "School Counselor",
-    "Social Studies 7-12",
-    "Bilingual Generalist EC-6",
-    "SPED SP EC-12",
-    "Superintendent",
-    "ESL/Generalist EC-6",
-    "Art EC-12",
-    "ELAR 8-12",
-    "Mathematics/Science 4-8",
-    "Life Science 8-12",
-    "Physics/Math 7-12",
-    "Mathematics 8-12",
-    "Science 7-12",
-    "Superintendent Parts I-II",
-    "TX PACT: ELAR 4-8",
-    "Life Science 7-12",
-    "PHYSICAL EDUCATION EC-12",
-    "Special Education Supp",
-    "Principal Pilot",
-    "TX PACT: EAS (Subtest III: Math)",
-    "TX PACT: EAS (Subtest II: Writing)",
-    "TX PACT: EAS (Subtest I Reading)",
-    "Chemistry 7-12",
-    "TX PACT: Music EC-12",
-    "TX PACT: Social Studies 7-12",
-    "Spanish 6-12",
-    "TX PACT: ELAR 7-12",
-    "TX PACT: Mathematics 4-8",
-    "Social Studies 4-8",
-    "LOTE-Spanish EC-12",
-    "Speech 7-12",
-    "Master Reading Teacher",
-    "Speech 8-12",
-    "ELAR 4-8",
-    "Journalism 8-12",
-    "TX PACT: Health EC 12",
-    "Theatre EC-12",
-    "TX PACT: Art EC-12",
-    "Mathematics 4-8",
-    "Social Studies 8-12",
-    "Physical Science 8-12",
-    "Master Tech Teacher EC-12",
-    "TX PACT: Theatre EC-12",
-    "Core Sub 4-8 Soc Studies",
-    "Core Sub 4-8 Science",
-    "Core Sub 4-8 ELAR",
-    "Core Sub 4-8 Math",
-    "Chemistry 8-12",
-    "Physical Science 6-12",
-    "TX PACT: History 7-12",
-    "Science 8-12",
-    "TX PACT: Physics 7-12",
-    "TX PACT: Mathematics 7-12",
-    "TX PACT: Life Science 7-12",
-    "Gifted and Talented Supp",
-    "TX PACT: Science 4-8",
-    "TOPT-French",
-    "French 6-12",
-    "TX PACT: LOTE Spanish EC-12",
-    "TX PACT: Physical Ed EC-12",
-    "LOTE-French EC-12",
-    "German 6-12",
-    "TX PACT: Core Subjects 4-8",
-    "TX PACT: Computer Science 8-12",
-    "TX PACT: Chemistry 7–12",
-    "TX PACT: Speech 7-12"
-]
+def classify_exam_names(exam_data):
+    """
+    Reads unique exam names from the data and splits them:
+      - starts with 'PPR'  -> Indicator 1a (pedagogy)
+      - everything else    -> Indicator 1b (content)
+    """
+    all_exams = (
+        exam_data['Exam Name']
+        .dropna()
+        .astype(str)
+        .str.strip()
+        .unique()
+        .tolist()
+    )
+
+    pedagogy = sorted(e for e in all_exams if e.upper().startswith("PPR"))
+    content = sorted(e for e in all_exams if not e.upper().startswith("PPR"))
+
+    return pedagogy, content
 
 
 def merge_chapter_3_data(exam_data, emp_data):
@@ -618,9 +537,20 @@ def render_indicator_1b_charts(
 
 # @st.cache_data
 def prepare_chapter_3(exam_roaster_data, educator_details_data):
+
+    exam_roaster_data['Exam Name'] = exam_roaster_data['Exam Name'].astype(str).str.strip()
+
+    # Build the lists dynamically from the uploaded exam file
+    pedagogy, content = classify_exam_names(exam_roaster_data)
+
+    # Update in place (slice assignment) so all functions using the globals see the change
+    indicator_1a_pedagogy[:] = pedagogy
+    indicator_1b_content[:] = content
+
     merge_data = merge_chapter_3_data(exam_roaster_data, educator_details_data)
     first_two_attempt_data = get_first_attempts_data(merge_data=merge_data)
     return first_two_attempt_data
+
 
 def exam_pass_rate(exam_roaster_data, educator_details_data):
 
@@ -628,107 +558,124 @@ def exam_pass_rate(exam_roaster_data, educator_details_data):
     st.write(' ')
     first_two_attempt_data = prepare_chapter_3(exam_roaster_data, educator_details_data)
 
-    # Indicator 1a
-    first_two_attempt_data_1a_data = first_two_attempt_data[first_two_attempt_data['Exam Name'].isin(indicator_1a_pedagogy)]
+    # Split once, up front
+    first_two_attempt_data_1a_data = first_two_attempt_data[
+        first_two_attempt_data['Exam Name'].isin(indicator_1a_pedagogy)
+    ]
+    first_two_attempt_data_1b_data = first_two_attempt_data[
+        first_two_attempt_data['Exam Name'].isin(indicator_1b_content)
+    ]
 
-    available_year_filter_1a = sorted(first_two_attempt_data_1a_data['Exam Date'].dt.year.unique().astype(int).tolist())
-    # available_exam_names_1a = sorted(first_two_attempt_data_1a_data['Exam Name'].unique().tolist())
+    year_taken_1a = []
 
-    if "chapter_3_year_filter_1a" not in st.session_state:
-        st.session_state.chapter_3_year_filter_1a = available_year_filter_1a[-1]
-
-    if "chapter_3_exam_name" not in st.session_state:
-        st.session_state.chapter_3_exam_name = "All"
-
-    # # ── Filters ──
+    # ───────────────── Indicator 1a ─────────────────
     st.subheader("🔍 Filter Options for Indicator 1a: Percent of Individuals Passing Pedagogy Tests")
-    filter_1a_col1, filter_1a_col2, filter_1a_col3 = st.columns(3)
 
-    with filter_1a_col1:
-        exam_year = st.selectbox(
-            "Exam Year",
-            options=available_year_filter_1a,
-            key="chapter_3_exam_year_1a",
+    if not indicator_1a_pedagogy or first_two_attempt_data_1a_data.empty:
+        st.info("No pedagogy (PPR) exams found in the uploaded data, so Indicator 1a cannot be calculated.")
+    else:
+        available_year_filter_1a = sorted(
+            first_two_attempt_data_1a_data['Exam Date'].dt.year.dropna().unique().astype(int).tolist()
         )
-        
-        # If the user changes selection, trigger a rerun so the preprocessor runs with new years
-        if exam_year != st.session_state.chapter_3_year_filter_1a:
+
+        if (
+            "chapter_3_year_filter_1a" not in st.session_state
+            or st.session_state.chapter_3_year_filter_1a not in available_year_filter_1a
+        ):
+            st.session_state.chapter_3_year_filter_1a = available_year_filter_1a[-1]
+
+        if "chapter_3_exam_name" not in st.session_state:
+            st.session_state.chapter_3_exam_name = "All"
+
+        filter_1a_col1, filter_1a_col2, filter_1a_col3 = st.columns(3)
+
+        with filter_1a_col1:
+            exam_year = st.selectbox(
+                "Exam Year",
+                options=available_year_filter_1a,
+                index=available_year_filter_1a.index(st.session_state.chapter_3_year_filter_1a),
+                key="chapter_3_exam_year_1a",
+            )
             st.session_state.chapter_3_year_filter_1a = exam_year
 
-    with filter_1a_col2:
-        exam_name = st.selectbox(
-            "Exam Name",
-            options=["All"] + indicator_1a_pedagogy,
-            key="chapter_3_exam_name_filter_1a",
+        with filter_1a_col2:
+            exam_name = st.selectbox(
+                "Exam Name",
+                options=["All"] + indicator_1a_pedagogy,
+                key="chapter_3_exam_name_filter_1a",
+            )
+            st.session_state.chapter_3_exam_name = exam_name
+
+        combined_df_1a, year_taken_1a = indicator_1a_data(
+            first_two_attempt_data_1a_data,
+            year_filter=st.session_state.chapter_3_year_filter_1a,
         )
-        st.session_state.chapter_3_exam_name = exam_name
-        # If the user changes selection, trigger a rerun so the preprocessor runs with new years
-        # if exam_name != st.session_state.chapter_3_exam_name:
-        #     st.session_state.chapter_3_exam_name = exam_name
 
-    # st.write(st.session_state.chapter_3_year_filter_1a)
-    combined_df_1a, year_taken_1a = indicator_1a_data(first_two_attempt_data_1a_data, year_filter=st.session_state.chapter_3_year_filter_1a)
+        if st.session_state.chapter_3_exam_name != "All":
+            combined_df_1a = combined_df_1a[combined_df_1a['Exam Name'] == st.session_state.chapter_3_exam_name]
 
-    # st.write(indicator_1a_data(first_two_attempt_data_1a_data, year_filter=2023, no_of_year=1))
-
-    if st.session_state.chapter_3_exam_name != "All":
-        combined_df_1a = combined_df_1a[combined_df_1a['Exam Name'] == st.session_state.chapter_3_exam_name]
-
-    indi_1a_result = calculate_asep_indicator_1a_calculation(combined_df_1a)
-    
-    render_indicator_1a_charts(indi_1a_result, combined_df_1a)
+        if combined_df_1a.empty:
+            st.info("No Indicator 1a records for the selected filters.")
+        else:
+            indi_1a_result = calculate_asep_indicator_1a_calculation(combined_df_1a)
+            render_indicator_1a_charts(indi_1a_result, combined_df_1a)
 
     st.markdown("---")
-    # indicator 1b
-    first_two_attempt_data_1b_data = first_two_attempt_data[first_two_attempt_data['Exam Name'].isin(indicator_1b_content)]
 
-    available_year_filter_1b = sorted(first_two_attempt_data_1b_data['Exam Date'].dt.year.unique().astype(int).tolist())
-
-    if "chapter_3_year_filter_1b" not in st.session_state:
-        st.session_state.chapter_3_year_filter_1b = available_year_filter_1b[-1]
-    
-    if "chapter_3_exam_name_1b" not in st.session_state:
-        st.session_state.chapter_3_exam_name_1b = "All"
-
+    # ───────────────── Indicator 1b ─────────────────
     st.subheader("🔍 Filter Options for Indicator 1b: Percent of Individuals Passing Content Pedagogy Tests")
-    filter_1b_col1, filter_1b_col2, filter_1b_col3 = st.columns(3)
 
-    with filter_1b_col1:
-        exam_year_1b = st.selectbox(
-            "Exam Year",
-            options=available_year_filter_1a,
-            key="chapter_3_exam_year_1b",
+    if not indicator_1b_content or first_two_attempt_data_1b_data.empty:
+        st.info("No content exams found in the uploaded data, so Indicator 1b cannot be calculated.")
+    else:
+        available_year_filter_1b = sorted(
+            first_two_attempt_data_1b_data['Exam Date'].dt.year.dropna().unique().astype(int).tolist()
         )
-        
-        # If the user changes selection, trigger a rerun so the preprocessor runs with new years
-        if exam_year_1b != st.session_state.chapter_3_year_filter_1b:
+
+        if (
+            "chapter_3_year_filter_1b" not in st.session_state
+            or st.session_state.chapter_3_year_filter_1b not in available_year_filter_1b
+        ):
+            st.session_state.chapter_3_year_filter_1b = available_year_filter_1b[-1]
+
+        if "chapter_3_exam_name_1b" not in st.session_state:
+            st.session_state.chapter_3_exam_name_1b = "All"
+
+        filter_1b_col1, filter_1b_col2, filter_1b_col3 = st.columns(3)
+
+        with filter_1b_col1:
+            exam_year_1b = st.selectbox(
+                "Exam Year",
+                options=available_year_filter_1b,          # fixed: was ..._1a
+                index=available_year_filter_1b.index(st.session_state.chapter_3_year_filter_1b),
+                key="chapter_3_exam_year_1b",
+            )
             st.session_state.chapter_3_year_filter_1b = exam_year_1b
 
-    with filter_1b_col2:
-        exam_name_1b = st.selectbox(
-            "Exam Name",
-            options=["All"] + indicator_1b_content,
-            key="chapter_3_exam_name_filter_1b",
+        with filter_1b_col2:
+            exam_name_1b = st.selectbox(
+                "Exam Name",
+                options=["All"] + indicator_1b_content,
+                key="chapter_3_exam_name_filter_1b",
+            )
+            st.session_state.chapter_3_exam_name_1b = exam_name_1b
+
+        combined_df_1b, year_taken = indicator_1b_data(
+            first_two_attempt_data_1b_data,
+            year_filter=st.session_state.chapter_3_year_filter_1b,
+            exam_name_filter=st.session_state.chapter_3_exam_name_1b,
         )
-        st.session_state.chapter_3_exam_name_1b = exam_name_1b
 
-    # st.write('Indicator 1b data')
-    combined_df_1b, year_taken = indicator_1b_data(first_two_attempt_data_1b_data, year_filter=st.session_state.chapter_3_year_filter_1b, exam_name_filter=st.session_state.chapter_3_exam_name_1b)
-    
-    
-    indi_1b_result = calculate_asep_indicator_1b_calculation(combined_df_1b)
-    
+        if combined_df_1b.empty:
+            st.info("No Indicator 1b records for the selected filters.")
+        else:
+            indi_1b_result = calculate_asep_indicator_1b_calculation(combined_df_1b)
 
-    all_unique_result=combined_df_1b['Certification Grade Level'].unique().tolist()
-    certificate_1b_cert_result = {}
+            certificate_1b_cert_result = {}
+            for cert in combined_df_1b['Certification Grade Level'].unique().tolist():
+                retrieved_data = combined_df_1b[combined_df_1b['Certification Grade Level'] == cert]
+                certificate_1b_cert_result[cert] = calculate_asep_indicator_1b_calculation(retrieved_data)
 
-
-    for i in all_unique_result:
-        retrieved_data = combined_df_1b[combined_df_1b['Certification Grade Level'] == i]
-        indi_1b_certification_result = calculate_asep_indicator_1b_calculation(retrieved_data)
-        certificate_1b_cert_result[i] = indi_1b_certification_result
-
-
-    render_indicator_1b_charts(indi_1b_result, len(combined_df_1b), certificate_1b_cert_result)
+            render_indicator_1b_charts(indi_1b_result, len(combined_df_1b), certificate_1b_cert_result)
 
     return first_two_attempt_data_1a_data, first_two_attempt_data_1b_data, year_taken_1a

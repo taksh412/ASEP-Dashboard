@@ -41,7 +41,6 @@ RED    = "#F85149"         # poor          2.0 – 2.5
 
 FONT_FAMILY = "Montserrat, sans-serif"
 
-
 # ─────────────────────────────────────────────
 # INJECT DARK CSS
 # ─────────────────────────────────────────────
@@ -211,124 +210,7 @@ Each dataset comes from a different report in **I2I**, **ECOS**, or **ResultsAna
     #     "click it to save the renamed file to your computer."
     # )
     # download_new_file()
-
-
-
-
-
-
-
-
-indicator_1a_pedagogy = [
-    "PPR EC-12",
-    "PPR EC-4",
-    "PPR 8-12",
-    "PPR EC-6",
-    "PPR 4-8"
-]
-
-indicator_1b_content = [
-    "Physical Education EC-12",
-    "Principal",
-    "Core Sub EC-6 Science",
-    "Core Sub EC-6 Soc Studies",
-    "Core Sub EC-6 ELAR/STR",
-    "Core Sub EC-6 Math",
-    "Core Sub EC-6 FA/Hlth/PE",
-    "ESL Supp",
-    "Generalist EC-4",
-    "History 8-12",
-    "Generalist EC-6",
-    "Mathematics 7-12",
-    "Music EC-12",
-    "Generalist 4-8",
-    "ELAR/Soc Studies 4-8",
-    "ELAR 7-12",
-    "Art All Level",
-    "Reading Specialist",
-    "Core Sub EC-6 ELAR",
-    "BTLPT - Spanish",
-    "Science of Teaching Reading",
-    "Bilingual Education Supp",
-    "Science 4-8",
-    "History 7-12",
-    "TOPT-Spanish",
-    "Bilingual Generalist EC-4",
-    "Special Education EC-12",
-    "School Counselor",
-    "Social Studies 7-12",
-    "Bilingual Generalist EC-6",
-    "SPED SP EC-12",
-    "Superintendent",
-    "ESL/Generalist EC-6",
-    "Art EC-12",
-    "ELAR 8-12",
-    "Mathematics/Science 4-8",
-    "Life Science 8-12",
-    "Physics/Math 7-12",
-    "Mathematics 8-12",
-    "Science 7-12",
-    "Superintendent Parts I-II",
-    "TX PACT: ELAR 4-8",
-    "Life Science 7-12",
-    "PHYSICAL EDUCATION EC-12",
-    "Special Education Supp",
-    "Principal Pilot",
-    "TX PACT: EAS (Subtest III: Math)",
-    "TX PACT: EAS (Subtest II: Writing)",
-    "TX PACT: EAS (Subtest I Reading)",
-    "Chemistry 7-12",
-    "TX PACT: Music EC-12",
-    "TX PACT: Social Studies 7-12",
-    "Spanish 6-12",
-    "TX PACT: ELAR 7-12",
-    "TX PACT: Mathematics 4-8",
-    "Social Studies 4-8",
-    "LOTE-Spanish EC-12",
-    "Speech 7-12",
-    "Master Reading Teacher",
-    "Speech 8-12",
-    "ELAR 4-8",
-    "Journalism 8-12",
-    "TX PACT: Health EC 12",
-    "Theatre EC-12",
-    "TX PACT: Art EC-12",
-    "Mathematics 4-8",
-    "Social Studies 8-12",
-    "Physical Science 8-12",
-    "Master Tech Teacher EC-12",
-    "TX PACT: Theatre EC-12",
-    "Core Sub 4-8 Soc Studies",
-    "Core Sub 4-8 Science",
-    "Core Sub 4-8 ELAR",
-    "Core Sub 4-8 Math",
-    "Chemistry 8-12",
-    "Physical Science 6-12",
-    "TX PACT: History 7-12",
-    "Science 8-12",
-    "TX PACT: Physics 7-12",
-    "TX PACT: Mathematics 7-12",
-    "TX PACT: Life Science 7-12",
-    "Gifted and Talented Supp",
-    "TX PACT: Science 4-8",
-    "TOPT-French",
-    "French 6-12",
-    "TX PACT: LOTE Spanish EC-12",
-    "TX PACT: Physical Ed EC-12",
-    "LOTE-French EC-12",
-    "German 6-12",
-    "TX PACT: Core Subjects 4-8",
-    "TX PACT: Computer Science 8-12",
-    "TX PACT: Chemistry 7–12",
-    "TX PACT: Speech 7-12"
-]
-
         
-
-
-
-
-
 
 
 def asep_index_score(first_two_attempt_data_1a_data, first_two_attempt_data_1b_data, principal_dataset, teacher_survey_dataset, student_growth_data, field_supervision_dataset, exit_survey_dataset):
@@ -627,7 +509,7 @@ def Feedback():
 
     # 1. Increased the iframe height property to 1200px
     ms_form_iframe = """
-    <iframe src="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=X505YZwk0ESyca3Ch_Mj_8Qon6bq6RdOvMeTNsPMoKRUMEtZRE85U05NTlFQNzZCVzI3Rjk3VVRXSy4u&embed=true" 
+    <iframe src="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=Q1vcXL7XqkyBc3KeOwpi2YDOWrpqsNZMmC3_tKFn49xUODVITTdFSUlIRU9JN0xOWEpPTDc5MDlYVC4u" 
         width="100%" 
             height="1200px" 
             frameborder="0" 

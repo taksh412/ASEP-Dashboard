@@ -24,6 +24,18 @@ FINISHER_COLUMNS = [
     'Status',
 ]
 
+EXAM_ROSTER_REQUIRED = {
+    "Examinee Name",
+    "TEAID",
+    "Exam Name",
+    "Exam Code",
+    "Exam Version",
+    "Exam Date",
+    "P/F Status",
+    "Reporting Type",
+}
+EXAM_ROSTER_OPTIONAL = {"Score Report Finder"}
+
 
 def is_finisher_file(uploaded_file) -> bool:
     """Peek at the file's real header row (row 3, i.e. skiprows=2) to see
@@ -207,20 +219,16 @@ def process_and_rename_file(uploaded_file):
     ):
         new_name = "academic_year_average_student_growth_by_candidate"
 
-    elif cols == sorted(
-        [
-            "Examinee Name",
-            "TEAID",
-            "Exam Name",
-            "Exam Code",
-            "Exam Version",
-            "Exam Date",
-            "P/F Status",
-            "Reporting Type",
-            "Score Report Finder",
-        ]
-    ):
+    elif (
+        EXAM_ROSTER_REQUIRED.issubset(set(cols))
+        and set(cols).issubset(EXAM_ROSTER_REQUIRED | EXAM_ROSTER_OPTIONAL)):
+
         new_name = "exam_roaster_data"
+
+        # Make the schema consistent so files with/without the column merge cleanly
+        for opt_col in EXAM_ROSTER_OPTIONAL:
+            if opt_col not in df.columns:
+                df[opt_col] = pd.NA
 
     elif cols == sorted(index_name):
         new_name = "observation_df"
